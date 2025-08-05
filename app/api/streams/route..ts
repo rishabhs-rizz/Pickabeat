@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { creatorId, url } = parsed.data;
-    const isYTurl = YT_REGEX.test(url);
+    const isYTurl = url.match(YT_REGEX);
 
     if (!isYTurl) {
       return NextResponse.json({
