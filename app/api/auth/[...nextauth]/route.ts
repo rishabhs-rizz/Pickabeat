@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "@/app/lib/db";
 
 const handler = NextAuth({
   providers: [
@@ -9,12 +10,39 @@ const handler = NextAuth({
     }),
   ],
 
+  session: {
+    strategy: "jwt", // You’re using JWT sessions
+  },
+
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id; // Add user.id to JWT token
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string; // Attach it to session.user
       }
       return session;
+    },
+
+    async signIn({ user }) {
+      if (!user.email) return false;
+
+      // Optional: Upsert instead of create
+      await prisma.user.upsert({
+        where: { email: user.email },
+        update: {},
+        create: {
+          email: user.email,
+          provider: "Google",
+        },
+      });
+
+      return true;
     },
   },
 });
