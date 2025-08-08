@@ -7,6 +7,11 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+      authorization: {
+        params: {
+          prompt: "consent select_account",
+        },
+      },
     }),
   ],
 
@@ -24,7 +29,7 @@ const handler = NextAuth({
 
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string; // Attach it to session.user
+        session.user.id = token.id as string;
       }
       return session;
     },
@@ -32,7 +37,6 @@ const handler = NextAuth({
     async signIn({ user }) {
       if (!user.email) return false;
 
-      // Optional: Upsert instead of create
       await prisma.user.upsert({
         where: { email: user.email },
         update: {},

@@ -1,7 +1,7 @@
 import { Main } from "next/document";
-import { Appbar } from "./components/Appbar";
-import { Maincomp } from "./components/MainComp";
-import { Features } from "./components/Features";
+import { Appbar } from "../components/ui/Appbar";
+import { Maincomp } from "../components/ui/MainComp";
+import { Features } from "../components/ui/Features";
 
 export default function Page() {
   return (

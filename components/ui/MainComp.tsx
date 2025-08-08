@@ -43,7 +43,7 @@ export function Maincomp() {
           >
             <Link href="#demo" className="flex items-center gap-2">
               <Vote className="size-4" aria-hidden="true" />
-              {"Try live demo"}
+              {"Try it Out"}
             </Link>
           </Button>
           <Button
