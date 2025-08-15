@@ -9,15 +9,10 @@ const UpvoteSchema = z.object({
 export async function POST(req: NextRequest) {
   const session = await getServerSession();
   const user = session?.user;
+
   if (!user || !user.id) {
-    return NextResponse.json(
-      {
-        message: "unAuthenticated",
-      },
-      {
-        status: 403,
-      }
-    );
+    console.log("inside upvote route", session);
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {

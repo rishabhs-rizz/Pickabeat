@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const parsed = createStreamSchema.safeParse(await req.json());
     if (!parsed.success) {
       return NextResponse.json(
-        { message: "Invalid data", errors: parsed.error.flatten() },
+        { message: "Invalid data", errors: parsed.error.flatten },
         { status: 400 }
       );
     }

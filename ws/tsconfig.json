@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* File structure */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Target modern Node.js features (Node 18+ supports ES2022 well) */
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    /* Enable Node.js type definitions */
+    "types": ["node"],
+
+    /* Strict type checking for safety */
+    "strict": true,
+    "noImplicitAny": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Output & debugging */
+    "sourceMap": true,
+    "declaration": false, // No need to generate .d.ts unless you're making a library
+
+    /* Performance & compatibility */
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
