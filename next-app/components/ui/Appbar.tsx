@@ -5,7 +5,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { sign } from "crypto";
 
 export function Appbar() {
   const [signedIn, setSignedIn] = useState(false);
