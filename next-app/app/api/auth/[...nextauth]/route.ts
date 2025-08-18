@@ -14,7 +14,10 @@ const handler = NextAuth({
   session: { strategy: "jwt" },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account) {
+        token.accesstoken = account.access_token;
+      }
       // First sign-in
       if (user?.email) {
         const dbUser = await prisma.user.upsert({

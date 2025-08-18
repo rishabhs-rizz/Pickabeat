@@ -19,7 +19,8 @@ export function DashBoard() {
           <div className="flex mt-6 w-1/4 gap-2 ">
             <input
               type="text"
-              className="bg-white/80 text-black w-full p-2 rounded-2xl"
+              placeholder="enter the song name"
+              className="bg-white/80 text-black w-full p-2 pl-4 rounded-2xl"
             />
             <span className="bg-white/80 text-black p-2 rounded-2xl">
               <Search />
