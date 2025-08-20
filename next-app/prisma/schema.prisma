@@ -14,6 +14,18 @@ model User {
   provider Provider
   streams  Stream[]
   upvotes  Upvote[]
+  rooms    Room[]
+}
+
+model Room {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  link        String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  streams     Stream[]
 }
 
 model Stream {
@@ -28,6 +40,8 @@ model Stream {
   upvotes     Upvote[]
   userId      String
   user        User       @relation(fields: [userId], references: [id])
+  roomId      String?
+  room        Room?      @relation(fields: [roomId], references: [id])
 }
 
 model Upvote {
