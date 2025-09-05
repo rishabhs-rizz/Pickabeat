@@ -17,25 +17,25 @@ export function usePlayerAuth(code: string) {
         setRefreshToken(res.data.refresh_token);
         setExpiresIn(res.data.expires_in);
         console.log(res.data);
-        window.history.pushState({}, "", "/PBplayer");
       })
       .catch((e) => console.log(e));
   }, [code]);
 
   useEffect(() => {
     if (!refreshToken || !expiresIn) return;
-    const timeout = setTimeout(() => {
+    const interval = setInterval(() => {
       axios
         .post("http://localhost:3000/api/refresh", { refreshToken })
         .then((res) => {
           setAccessToken(res.data.access_token);
           setExpiresIn(res.data.expires_in);
           console.log(res.data);
-          window.history.pushState({}, "", "/PBplayer");
         })
-        .catch((e) => console.log(e));
+        .catch(() => {
+          window.location.href = "/dashboard";
+        });
     }, (expiresIn - 60) * 1000);
-    return () => clearTimeout(timeout);
+    return () => clearInterval(interval);
   }, [refreshToken, expiresIn]);
 
   return accessToken;
