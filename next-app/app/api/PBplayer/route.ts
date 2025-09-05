@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 const SpotifyWebApi = require("spotify-web-api-node");
 
 function corsResponse(body: any, status = 200) {
@@ -13,7 +13,14 @@ function corsResponse(body: any, status = 200) {
 }
 
 export async function OPTIONS() {
-  return corsResponse({}, 200);
+  const res = NextResponse.json({});
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  return res;
 }
 
 export async function POST(req: NextRequest) {
@@ -21,7 +28,7 @@ export async function POST(req: NextRequest) {
   const code = body?.code ?? "";
 
   if (!code) {
-    return corsResponse({ error: "Code is required" }, 400);
+    return NextResponse.json({ error: "Code is required" });
   }
 
   const spotifyApi = new SpotifyWebApi({
@@ -34,9 +41,25 @@ export async function POST(req: NextRequest) {
     const data = await spotifyApi.authorizationCodeGrant(code);
     const { access_token, refresh_token, expires_in } = data.body;
 
-    return corsResponse({ access_token, refresh_token, expires_in }, 200);
+    const res = NextResponse.json({
+      access_token,
+      refresh_token,
+      expires_in,
+    });
+
+    res.headers.set("Access-Control-Allow-Origin", "*");
+    res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+
+    return res;
   } catch (e) {
     console.error("Error during Spotify authentication:", e);
-    return corsResponse({ error: "Internal server error" }, 500);
+    return NextResponse.json(
+      { error: "Failed to authenticate with Spotify" },
+      { status: 400 }
+    );
   }
 }
