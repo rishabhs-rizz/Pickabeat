@@ -1,9 +1,14 @@
 import { SearchIcon } from "lucide-react";
 
-export function Search() {
+export function Search({
+  onChange,
+}: {
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
   return (
-    <div className="flex mt-2 w-1/4 gap-2 ">
+    <div className="flex mt-2 gap-2 ">
       <input
+        onChange={onChange}
         type="text"
         placeholder="enter the song name"
         className="bg-white/80 text-black w-full p-2 pl-4 rounded-2xl"

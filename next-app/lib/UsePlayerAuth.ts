@@ -18,7 +18,9 @@ export function usePlayerAuth(code: string) {
         setExpiresIn(res.data.expires_in);
         console.log(res.data);
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        window.location.href = "http://localhost:3000/dashboard";
+      });
   }, [code]);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function usePlayerAuth(code: string) {
           setExpiresIn(res.data.expires_in);
           console.log(res.data);
         })
-        .catch(() => {
+        .catch((e) => {
           window.location.href = "/dashboard";
         });
     }, (expiresIn - 60) * 1000);
