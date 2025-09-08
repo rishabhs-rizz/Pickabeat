@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { set } from "zod";
 
 export function usePlayerAuth(code: string) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -16,7 +15,6 @@ export function usePlayerAuth(code: string) {
         setAccessToken(res.data.access_token);
         setRefreshToken(res.data.refresh_token);
         setExpiresIn(res.data.expires_in);
-        console.log(res.data);
       })
       .catch((e) => {
         window.location.href = "http://localhost:3000/dashboard";
@@ -31,10 +29,9 @@ export function usePlayerAuth(code: string) {
         .then((res) => {
           setAccessToken(res.data.access_token);
           setExpiresIn(res.data.expires_in);
-          console.log(res.data);
         })
         .catch((e) => {
-          window.location.href = "/dashboard";
+          window.location.href = "http://localhost:3000/dashboard";
         });
     }, (expiresIn - 60) * 1000);
     return () => clearInterval(interval);

@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,5 +25,11 @@ export async function GET(req: NextRequest) {
     );
     const res = NextResponse.json({ data: response.data }, { status: 200 });
     return addCorsHeaders(res);
-  } catch (error: any) {}
+  } catch (e) {
+    console.log("error" + e);
+    return NextResponse.json(
+      { error: "Failed to convert the spotify url to YT" },
+      { status: 400 }
+    );
+  }
 }

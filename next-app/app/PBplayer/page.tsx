@@ -10,7 +10,6 @@ import { Home, SearchIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
-import { set } from "zod";
 
 export type Track = {
   artist: string;
