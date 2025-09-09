@@ -3,7 +3,7 @@ import { SearchResults } from "@/components/SearchResults";
 import { ActionButtons } from "@/components/ui/ActionButtons";
 import Player from "@/components/ui/PlayerTab";
 import { Search } from "@/components/ui/Search";
-import { handleMusicPlaying } from "@/lib/Handlers";
+import { handleMusicConverting, handleMusicPlaying } from "@/lib/Handlers";
 import { usePlayerAuth } from "@/lib/usePlayerAuth";
 
 import { Home, SearchIcon } from "lucide-react";
@@ -26,13 +26,16 @@ const PBplayerPage = () => {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
+  const [audioLink, setAudioLink] = useState<string | null>(null);
 
-  function chooseTrack(track: Track) {
+  async function chooseTrack(track: Track) {
     setPlayingTrack(track);
 
     setSearch("");
     setSearchResults([]);
-    handleMusicPlaying(track.uri);
+    const YTLINK = await handleMusicConverting(track.uri);
+    const audLink = await handleMusicPlaying(YTLINK);
+    setAudioLink(audLink);
   }
 
   const spotifyApiRef = useRef(
@@ -98,6 +101,7 @@ const PBplayerPage = () => {
       </div>
 
       <div className="bottom-0">
+        {audioLink && <audio src={audioLink} controls autoPlay />}
         {/* <Player accessToken={accessToken} trackUri={playingTrack?.uri} /> */}
       </div>
     </div>
