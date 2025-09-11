@@ -1,12 +1,11 @@
 "use client";
 import { SearchResults } from "@/components/SearchResults";
 import { ActionButtons } from "@/components/ui/ActionButtons";
-import Player from "@/components/ui/PlayerTab";
 import { Search } from "@/components/ui/Search";
 import { handleMusicConverting, handleMusicPlaying } from "@/lib/Handlers";
 import { usePlayerAuth } from "@/lib/usePlayerAuth";
 
-import { Home, SearchIcon } from "lucide-react";
+import { Home } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -26,16 +25,16 @@ const PBplayerPage = () => {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
-  const [audioLink, setAudioLink] = useState<string | null>(null);
+  const [videoId, setVideoId] = useState<string | null>(null);
 
   async function chooseTrack(track: Track) {
     setPlayingTrack(track);
 
     setSearch("");
     setSearchResults([]);
-    const YTLINK = await handleMusicConverting(track.uri);
-    const audLink = await handleMusicPlaying(YTLINK);
-    setAudioLink(audLink);
+    const res = await handleMusicConverting(track.uri);
+    const videoId = res?.split("v=")[1].split("&")[0];
+    setVideoId(videoId);
   }
 
   const spotifyApiRef = useRef(
@@ -75,6 +74,38 @@ const PBplayerPage = () => {
     };
   }, [search, accessToken]);
 
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!videoId) return;
+
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+
+    let player: any;
+
+    (window as any).onYouTubeIframeAPIReady = () => {
+      player = new (window as any).YT.Player("ytplayer", {
+        videoId,
+        playerVars: { autoplay: 1, mute: 1 },
+      });
+      playerRef.current = player;
+    };
+
+    const handleClick = () => {
+      if (playerRef.current && typeof playerRef.current.unMute === "function") {
+        playerRef.current.unMute();
+      }
+    };
+
+    window.addEventListener("click", handleClick, { once: true });
+
+    return () => {
+      window.removeEventListener("click", handleClick);
+    };
+  }, [videoId]);
+
   if (!code) return <div>Code not found</div>;
   if (!accessToken) return <div>Loading…</div>;
 
@@ -101,9 +132,32 @@ const PBplayerPage = () => {
       </div>
 
       <div className="bottom-0">
-        {audioLink && <audio src={audioLink} controls autoPlay />}
-        {/* <Player accessToken={accessToken} trackUri={playingTrack?.uri} /> */}
+        <div id="ytplayer-container">
+          {videoId && (
+            <div id="ytplayer" className="w-full h-60">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
+                title="YouTube Video"
+                allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* <div className="bottom-0">
+        {videoId && (
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
+            title="YouTube Video"
+            allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        )}
+      </div> */}
     </div>
   );
 };
