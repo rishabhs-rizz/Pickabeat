@@ -2,8 +2,7 @@
 import { SearchResults } from "@/components/SearchResults";
 import { ActionButtons } from "@/components/ui/ActionButtons";
 import { Search } from "@/components/ui/Search";
-import { handleMusicConverting, handleMusicPlaying } from "@/lib/Handlers";
-import { usePlayerAuth } from "@/lib/usePlayerAuth";
+import { getYoutubeVideoId, handleMusicConverting } from "@/lib/Handlers";
 
 import { Home } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -19,8 +18,7 @@ export type Track = {
 
 const PBplayerPage = () => {
   const searchParams = useSearchParams();
-  const code = searchParams.get("code");
-  const accessToken = usePlayerAuth(code || "");
+  const accessToken = searchParams.get("accessToken");
 
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
@@ -33,8 +31,9 @@ const PBplayerPage = () => {
     setSearch("");
     setSearchResults([]);
     const res = await handleMusicConverting(track.uri);
-    const videoId = res?.split("v=")[1].split("&")[0];
-    setVideoId(videoId);
+    const id = getYoutubeVideoId(res || "");
+    setVideoId(id);
+    console.log("YouTube Video ID:", id);
   }
 
   const spotifyApiRef = useRef(
@@ -74,39 +73,6 @@ const PBplayerPage = () => {
     };
   }, [search, accessToken]);
 
-  const playerRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (!videoId) return;
-
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.body.appendChild(tag);
-
-    let player: any;
-
-    (window as any).onYouTubeIframeAPIReady = () => {
-      player = new (window as any).YT.Player("ytplayer", {
-        videoId,
-        playerVars: { autoplay: 1, mute: 1 },
-      });
-      playerRef.current = player;
-    };
-
-    const handleClick = () => {
-      if (playerRef.current && typeof playerRef.current.unMute === "function") {
-        playerRef.current.unMute();
-      }
-    };
-
-    window.addEventListener("click", handleClick, { once: true });
-
-    return () => {
-      window.removeEventListener("click", handleClick);
-    };
-  }, [videoId]);
-
-  if (!code) return <div>Code not found</div>;
   if (!accessToken) return <div>Loading…</div>;
 
   return (
@@ -131,33 +97,20 @@ const PBplayerPage = () => {
         <ActionButtons />
       </div>
 
-      <div className="bottom-0">
-        <div id="ytplayer-container">
+      <div id="ytplayer-container">
+        <div id="ytplayer" className="w-full h-60">
           {videoId && (
-            <div id="ytplayer" className="w-full h-60">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
-                title="YouTube Video"
-                allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
+            <iframe
+              key={videoId}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
+              title="YouTube Video"
+              allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
           )}
         </div>
       </div>
-
-      {/* <div className="bottom-0">
-        {videoId && (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
-            title="YouTube Video"
-            allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
-        )}
-      </div> */}
     </div>
   );
 };
