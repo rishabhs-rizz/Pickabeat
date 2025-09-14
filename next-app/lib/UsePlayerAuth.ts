@@ -17,7 +17,7 @@ export function usePlayerAuth(code: string) {
         setExpiresIn(res.data.expires_in);
       })
       .catch((e) => {
-        window.location.href = "http://localhost:3000/dashboard";
+        window.location.href = "http://localhost:3000/";
       });
   }, [code]);
 
@@ -31,7 +31,7 @@ export function usePlayerAuth(code: string) {
           setExpiresIn(res.data.expires_in);
         })
         .catch((e) => {
-          window.location.href = "http://localhost:3000/dashboard";
+          window.location.href = "http://localhost:3000/";
         });
     }, (expiresIn - 60) * 1000);
     return () => clearInterval(interval);

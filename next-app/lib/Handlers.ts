@@ -20,13 +20,13 @@ export const handleMusicConverting = async (uri: string) => {
     console.error("Error playing track in handlers.ts:", error);
   }
 };
-export const handleMusicPlaying = async (uri: string) => {
-  try {
-  } catch (err) {
-    console.error("Error extracting audio:", err);
-    throw err;
-  }
-};
+
+export function getYoutubeVideoId(url: string): string | null {
+  const pattern =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+  const matches = url.match(pattern);
+  return matches ? matches[1] : null;
+}
 
 export const handleGetStarted = () => {
   const AUTH_URL = process.env.AUTH_URL;

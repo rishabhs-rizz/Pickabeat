@@ -3,8 +3,8 @@ import { PlayCircle, Waves } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Appbar() {
   const [signedIn, setSignedIn] = useState(false);
@@ -58,9 +58,9 @@ export function Appbar() {
                 asChild
                 className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500"
               >
-                <Link href="#cta" className="flex items-center gap-1">
+                <Link href="/dashboard" className="flex items-center gap-1">
                   <PlayCircle className="size-4" aria-hidden="true" />
-                  {"Launch App"}
+                  {"Listen Music"}
                 </Link>
               </Button>
               <button
@@ -76,15 +76,6 @@ export function Appbar() {
           )}
           {!session.data?.user && (
             <>
-              <Button
-                asChild
-                className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500"
-              >
-                <Link href="#cta" className="flex items-center gap-1">
-                  <PlayCircle className="size-4" aria-hidden="true" />
-                  {"Launch App"}
-                </Link>
-              </Button>
               <button
                 className="p-2 text-sm text-white/80 hover:text-white transition"
                 onClick={() => {
