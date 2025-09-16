@@ -4,17 +4,17 @@ import { Button } from "@/components/ui/button";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export function Appbar() {
   const [signedIn, setSignedIn] = useState(false);
   const session = useSession();
-  const router = useRouter();
+
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL;
 
   function handleSignIn() {
     setSignedIn(true);
     signIn("google", {
-      callbackUrl: "/dashboard",
+      callbackUrl: "/",
     });
   }
   return (
@@ -58,7 +58,7 @@ export function Appbar() {
                 asChild
                 className="bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500"
               >
-                <Link href="/dashboard" className="flex items-center gap-1">
+                <Link href={AUTH_URL!} className="flex items-center gap-1">
                   <PlayCircle className="size-4" aria-hidden="true" />
                   {"Listen Music"}
                 </Link>
