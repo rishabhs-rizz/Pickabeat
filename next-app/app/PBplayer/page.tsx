@@ -8,6 +8,9 @@ import { Home } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
+import axios from "axios";
+import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
+import { parseLRC } from "@/lib/utils";
 
 export type Track = {
   artist: string;
@@ -15,6 +18,8 @@ export type Track = {
   uri: string;
   albumUrl: string;
 };
+
+export type LyricLine = { time: number; text: string };
 
 const PBplayerPage = () => {
   const searchParams = useSearchParams();
@@ -25,16 +30,11 @@ const PBplayerPage = () => {
   const [searchResults, setSearchResults] = useState<Track[]>([]);
   const [playingTrack, setPlayingTrack] = useState<Track | null>(null);
   const [videoId, setVideoId] = useState<string | null>(null);
-
-  async function chooseTrack(track: Track) {
-    setPlayingTrack(track);
-    setSearch("");
-    setSearchResults([]);
-    const res = await handleMusicConverting(track.uri);
-    const id = getYoutubeVideoId(res || "");
-    setVideoId(id);
-    console.log("YouTube Video ID:", id);
-  }
+  const [lyrics, setLyrics] = useState<LyricLine[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+  const intervalRef = useRef<number | null>(null);
+  const lyricsRefs = useRef<Array<HTMLParagraphElement | null>>([]);
 
   const spotifyApiRef = useRef(
     new SpotifyWebApi({
@@ -48,12 +48,32 @@ const PBplayerPage = () => {
     if (accessToken) spotifyApiRef.current.setAccessToken(accessToken);
   }, [accessToken]);
 
+  async function chooseTrack(track: Track) {
+    setPlayingTrack(track);
+    setSearch("");
+    setSearchResults([]);
+    const res = await handleMusicConverting(track.uri);
+    const id = getYoutubeVideoId(res || "");
+    setVideoId(id);
+    setActiveIndex(0);
+  }
+
+  // fetch LRC when track changes
+  useEffect(() => {
+    if (!playingTrack) return;
+    axios
+      .get("http://localhost:3000/api/lyrics", {
+        params: { track: playingTrack.title, artist: playingTrack.artist },
+      })
+      .then((res) => setLyrics(parseLRC(res.data.lyrics || "")))
+      .catch(() => setLyrics([]));
+  }, [playingTrack]);
+
   useEffect(() => {
     if (!search || !accessToken) {
       setSearchResults([]);
       return;
     }
-
     let cancel = false;
     spotifyApiRef.current.searchTracks(search).then((res: any) => {
       if (cancel) return;
@@ -65,20 +85,49 @@ const PBplayerPage = () => {
           albumUrl: track.album.images[0].url,
         }))
       );
-      console.log(searchResults);
     });
-
     return () => {
       cancel = true;
     };
   }, [search, accessToken]);
 
-  if (!accessToken)
+  // poll current time to update activeIndex
+  useEffect(() => {
+    if (!player || lyrics.length === 0) return;
+
+    intervalRef.current = window.setInterval(() => {
+      const t = player.getCurrentTime();
+      let idx = lyrics.findIndex((l, i) => {
+        const next = lyrics[i + 1];
+        return t >= l.time && (!next || t < next.time);
+      });
+      if (idx === -1) idx = lyrics.length - 1;
+      setActiveIndex(idx);
+    }, 300);
+
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [player, lyrics]);
+
+  useEffect(() => {
+    if (lyricsRefs.current[activeIndex]) {
+      lyricsRefs.current[activeIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center", // keeps the line roughly in the middle
+      });
+    }
+  }, [activeIndex]);
+
+  if (!accessToken) {
     return (
       <div className="flex items-center justify-center min-h-screen text-2xl text-white">
         Loading…
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#07060C] via-[#1a1333] to-[#3a1c71] text-white flex flex-col items-center">
@@ -98,10 +147,7 @@ const PBplayerPage = () => {
           <div className="w-full max-w-xl mx-auto">
             <Search onChange={(e) => setSearch(e.target.value)} />
             {searchResults.length > 0 && (
-              <div
-                className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-xl max-h-96 overflow-y-auto rounded-2xl bg-black/90 backdrop-blur-lg shadow-2xl border border-purple-700 custom-scrollbar transition-all z-30"
-                style={{ top: "100%" }}
-              >
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-xl max-h-96 overflow-y-auto rounded-2xl bg-black/90 backdrop-blur-lg shadow-2xl border border-purple-700 custom-scrollbar transition-all z-30">
                 {searchResults.map((track) => (
                   <SearchResults
                     track={track}
@@ -114,59 +160,48 @@ const PBplayerPage = () => {
           </div>
         </div>
 
-        {/* player */}
         <div className="mt-12 flex flex-row items-center justify-center gap-10">
-          <div className="w-[420px] h-[420px] relative flex flex-col items-center justify-center rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-6">
-            {/* {playingTrack?.albumUrl && (
-              <img
-                src={playingTrack.albumUrl}
-                alt={playingTrack.title}
-                className="absolute top-0 left-0 w-full h-full object-cover rounded-2xl opacity-80 z-10 pointer-events-none"
-                style={{ boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)" }}
-              />
-            )} */}
+          {/*yt player */}
+          <div className="w-[420px] h-[420px] rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-4 flex items-center justify-center">
             {videoId ? (
-              <iframe
-                key={videoId}
-                className="w-full h-full rounded-2xl relative z-0"
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
-                title="YouTube Video"
-                allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                style={{
-                  mixBlendMode: "multiply",
-                  background: "rgba(0,0,0,0.7)",
-                  border: "none",
+              <YouTube
+                videoId={videoId}
+                opts={{
+                  width: "400",
+                  height: "400",
+                  playerVars: { autoplay: 1 },
                 }}
+                onReady={(e: YouTubeEvent) => setPlayer(e.target)}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center rounded-2xl bg-black/80 text-gray-400 text-xl relative z-0">
-                No video selected
-              </div>
+              <div className="text-gray-400 text-xl">No video selected</div>
             )}
-            {/* Track Info */}
-            {/* <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-center bg-black/60 px-4 py-2 rounded-xl shadow-lg">
-              {playingTrack ? (
-                <>
-                  <div className="text-lg font-semibold text-purple-300">
-                    Now Playing:
-                  </div>
-                  <div className="text-white text-xl font-bold">
-                    {playingTrack.title}
-                  </div>
-                  <div className="text-white/80 text-md">
-                    {playingTrack.artist}
-                  </div>
-                </>
-              ) : (
-                <span className="text-white/60">Pick a track to play!</span>
-              )}
-            </div> */}
           </div>
 
-          {/* Lyrics area */}
-          <div className="flex-1 h-[420px] rounded-3xl bg-black/40 backdrop-blur-md shadow-2xl p-8 flex flex-col justify-center items-start"></div>
+          {/* Lyrics */}
+          <div className="flex-1 h-[420px] rounded-3xl bg-black/40 backdrop-blur-md shadow-2xl p-8 flex flex-col justify-center items-start">
+            <div className="overflow-y-auto w-full h-full space-y-3 custom-scrollbar">
+              {lyrics.length === 0 ? (
+                <p className="text-purple-200">No lyrics found</p>
+              ) : (
+                lyrics.map((line, i) => (
+                  <p
+                    key={i}
+                    ref={(el: HTMLParagraphElement | null) => {
+                      lyricsRefs.current[i] = el;
+                    }}
+                    className={
+                      i === activeIndex
+                        ? "text-purple-400 font-bold"
+                        : "text-purple-100"
+                    }
+                  >
+                    {line.text}
+                  </p>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
