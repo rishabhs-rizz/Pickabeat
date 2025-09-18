@@ -19,6 +19,7 @@ import axios from "axios";
 import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import { parseLRC } from "@/lib/utils";
 import Controllables from "@/components/ui/Controllables";
+import LyricsBox from "@/components/ui/lyrics";
 
 export type Track = {
   artist: string;
@@ -217,10 +218,12 @@ const PBplayerPage = () => {
           </div>
 
           {/* Lyrics */}
-          <div className="flex-1 h-[420px] rounded-3xl bg-black/40 backdrop-blur-md shadow-2xl p-8 flex flex-col justify-center items-start">
+          {/* <div className="flex-1 h-[460px] rounded-3xl bg-black/40 backdrop-blur-md shadow-2xl p-8 flex justify-center items-center">
             <div className="overflow-y-auto w-full h-full space-y-3 custom-scrollbar">
               {lyrics.length === 0 ? (
-                <p className="text-purple-200">No lyrics found</p>
+                <p className="text-purple-300 text-center italic mt-10">
+                  No lyrics found
+                </p>
               ) : (
                 lyrics.map((line, i) => (
                   <p
@@ -228,18 +231,29 @@ const PBplayerPage = () => {
                     ref={(el: HTMLParagraphElement | null) => {
                       lyricsRefs.current[i] = el;
                     }}
-                    className={
-                      i === activeIndex
-                        ? "text-purple-400 font-bold"
-                        : "text-purple-100"
-                    }
+                    className={`
+          transition-all duration-300 ease-in-out transform
+          ${
+            i === activeIndex
+              ? "text-purple-400 font-extrabold text-3xl scale-105"
+              : "text-purple-200 text-2xl opacity-80"
+          }
+          hover:text-purple-300 hover:scale-105
+        `}
+                    style={{
+                      textShadow:
+                        i === activeIndex
+                          ? "0 0 10px #A78BFA, 0 0 20px #7C3AED"
+                          : "none",
+                    }}
                   >
                     {line.text}
                   </p>
                 ))
               )}
             </div>
-          </div>
+          </div> */}
+          <LyricsBox lyrics={lyrics} activeIndex={activeIndex} />
         </div>
       </div>
     </div>
