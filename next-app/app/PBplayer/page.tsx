@@ -4,13 +4,21 @@ import { ActionButtons } from "@/components/ui/ActionButtons";
 import { Search } from "@/components/ui/Search";
 import { getYoutubeVideoId, handleMusicConverting } from "@/lib/Handlers";
 import { usePlayerAuth } from "@/lib/usePlayerAuth";
-import { Home } from "lucide-react";
+import {
+  Home,
+  Pause,
+  SkipBack,
+  SkipForward,
+  SlidersHorizontal,
+  Volume,
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import { parseLRC } from "@/lib/utils";
+import Controllables from "@/components/ui/Controllables";
 
 export type Track = {
   artist: string;
@@ -162,20 +170,27 @@ const PBplayerPage = () => {
 
         <div className="mt-12 flex flex-row items-center justify-center gap-10">
           {/*yt player */}
-          <div className="w-[420px] h-[420px] rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-4 flex items-center justify-center">
-            {videoId ? (
-              <YouTube
-                videoId={videoId}
-                opts={{
-                  width: "400",
-                  height: "400",
-                  playerVars: { autoplay: 1 },
-                }}
-                onReady={(e: YouTubeEvent) => setPlayer(e.target)}
-              />
-            ) : (
-              <div className="text-gray-400 text-xl">No video selected</div>
-            )}
+          <div className="flex flex-col items-center">
+            <div className="w-[300px] h-[300px] rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-4 flex items-center justify-center">
+              {videoId ? (
+                <YouTube
+                  videoId={videoId}
+                  opts={{
+                    width: "300",
+                    height: "300",
+                    playerVars: { autoplay: 1 },
+                  }}
+                  onReady={(e: YouTubeEvent) => setPlayer(e.target)}
+                />
+              ) : (
+                <div className="text-gray-400 text-xl">No video selected</div>
+              )}
+            </div>
+            // PBplayerPage
+            <Controllables
+              player={player}
+              duration={player ? player.getDuration() : 0}
+            />
           </div>
 
           {/* Lyrics */}
