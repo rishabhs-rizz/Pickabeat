@@ -41,6 +41,7 @@ const PBplayerPage = () => {
   const [lyrics, setLyrics] = useState<LyricLine[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+  const [playing, setPlaying] = useState(false);
   const intervalRef = useRef<number | null>(null);
   const lyricsRefs = useRef<Array<HTMLParagraphElement | null>>([]);
 
@@ -124,7 +125,7 @@ const PBplayerPage = () => {
     if (lyricsRefs.current[activeIndex]) {
       lyricsRefs.current[activeIndex]?.scrollIntoView({
         behavior: "smooth",
-        block: "center", // keeps the line roughly in the middle
+        block: "center",
       });
     }
   }, [activeIndex]);
@@ -171,25 +172,47 @@ const PBplayerPage = () => {
         <div className="mt-12 flex flex-row items-center justify-center gap-10">
           {/*yt player */}
           <div className="flex flex-col items-center">
-            <div className="w-[300px] h-[300px] rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-4 flex items-center justify-center">
+            <div className="w-[300px] h-[300px] relative rounded-3xl bg-black/60 backdrop-blur-lg shadow-2xl p-4 flex items-center justify-center">
+              {playingTrack?.albumUrl && (
+                <>
+                  <img
+                    src={playingTrack.albumUrl}
+                    alt={playingTrack.title}
+                    className="absolute w-[270px] h-[270px] object-cover rounded-2xl opacity-100 z-10 pointer-events-none"
+                    style={{
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                    }}
+                  />
+                </>
+              )}
               {videoId ? (
                 <YouTube
                   videoId={videoId}
                   opts={{
-                    width: "300",
-                    height: "300",
+                    width: "260",
+                    height: "260",
                     playerVars: { autoplay: 1 },
                   }}
                   onReady={(e: YouTubeEvent) => setPlayer(e.target)}
+                  onStateChange={(e) => {
+                    if (e.data === 1) setPlaying(true); // PLAYING
+                    else if (e.data === 2 || e.data === 0) setPlaying(false); // PAUSED or ENDED
+                  }}
                 />
               ) : (
                 <div className="text-gray-400 text-xl">No video selected</div>
               )}
             </div>
-            // PBplayerPage
+            <span className="w-full pl-4">
+              <p className="font-bold">{playingTrack?.title}</p>{" "}
+              <p className="text-xs font-light">{playingTrack?.artist}</p>
+            </span>
+
             <Controllables
               player={player}
               duration={player ? player.getDuration() : 0}
+              playing={playing}
+              setPlaying={setPlaying}
             />
           </div>
 
