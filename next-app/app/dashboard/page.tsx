@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
+import axios from "axios";
 
 interface DashBoardProps {
   searchParams: { code?: string };
@@ -28,6 +29,14 @@ export default function DashBoard({ searchParams }: DashBoardProps) {
       pauseOnHover: false,
       draggable: false,
     });
+
+  async function handleCreateStream() {
+    const ticket = await axios
+      .get("http://localhost:3000/api/ws-ticket")
+      .then((res) => res.data.ticket);
+    // const ws = new WebSocket(`ws://localhost:8080?ticket=${ticket}`);
+    console.log("Ticket:", ticket);
+  }
 
   return (
     <>
@@ -73,6 +82,7 @@ export default function DashBoard({ searchParams }: DashBoardProps) {
           <p className="mt-2 text-sm text-white/50">
             (Use this button to start listening your favorite music.)
           </p>
+          <button onClick={handleCreateStream}>hi</button>
         </div>
       </div>
     </>

@@ -148,7 +148,7 @@ const PBplayerPage = () => {
             href="/dashboard"
             className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition shadow-lg"
           >
-            <Home size={28} />
+            <Home size={20} />
           </a>
           <div className="w-full max-w-xl mx-auto">
             <Search onChange={(e) => setSearch(e.target.value)} />
@@ -166,23 +166,6 @@ const PBplayerPage = () => {
           </div>
           <ActionButtons />
         </div>
-
-        {/* <div className="relative flex flex-col items-center mb-2 bg-amber-50">
-          <div className="w-full max-w-xl mx-auto">
-            <Search onChange={(e) => setSearch(e.target.value)} />
-            {searchResults.length > 0 && (
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-xl max-h-96 overflow-y-auto rounded-2xl bg-black/90 backdrop-blur-lg shadow-2xl border border-purple-700 custom-scrollbar transition-all z-30">
-                {searchResults.map((track) => (
-                  <SearchResults
-                    track={track}
-                    key={track.uri}
-                    chooseTrack={chooseTrack}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div> */}
 
         <div className="mt-12 flex flex-row items-center justify-center gap-10">
           {/*yt player */}
@@ -230,43 +213,6 @@ const PBplayerPage = () => {
               setPlaying={setPlaying}
             />
           </div>
-
-          {/* Lyrics */}
-          {/* <div className="flex-1 h-[460px] rounded-3xl bg-black/40 backdrop-blur-md shadow-2xl p-8 flex justify-center items-center">
-            <div className="overflow-y-auto w-full h-full space-y-3 custom-scrollbar">
-              {lyrics.length === 0 ? (
-                <p className="text-purple-300 text-center italic mt-10">
-                  No lyrics found
-                </p>
-              ) : (
-                lyrics.map((line, i) => (
-                  <p
-                    key={i}
-                    ref={(el: HTMLParagraphElement | null) => {
-                      lyricsRefs.current[i] = el;
-                    }}
-                    className={`
-          transition-all duration-300 ease-in-out transform
-          ${
-            i === activeIndex
-              ? "text-purple-400 font-extrabold text-3xl scale-105"
-              : "text-purple-200 text-2xl opacity-80"
-          }
-          hover:text-purple-300 hover:scale-105
-        `}
-                    style={{
-                      textShadow:
-                        i === activeIndex
-                          ? "0 0 10px #A78BFA, 0 0 20px #7C3AED"
-                          : "none",
-                    }}
-                  >
-                    {line.text}
-                  </p>
-                ))
-              )}
-            </div>
-          </div> */}
           <LyricsBox lyrics={lyrics} activeIndex={activeIndex} />
         </div>
       </div>
