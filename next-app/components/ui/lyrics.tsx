@@ -54,7 +54,7 @@ export default function LyricsBox({ lyrics, activeIndex }: LyricsProps) {
                 text-center break-words transition-all duration-100 ease-in-out transform
                 ${
                   i === activeIndex
-                    ? "text-purple-400 font-extrabold text-2xl"
+                    ? "text-[#F2F1EB] font-extrabold text-2xl"
                     : "text-purple-200 text-xl opacity-50"
                 }
                 hover:text-purple-300

@@ -54,7 +54,7 @@ export default function Controllables({
         value={current}
         step="0.1"
         onChange={(e) => player?.seekTo(Number(e.target.value), true)}
-        className="w-full -mt-2 accent-purple-400 cursor-pointer"
+        className="w-full -mt-2 accent-white cursor-pointer"
       />
       <div className="flex -mt-4 justify-between text-xs text-gray-300">
         <span>{formatTime(current)}</span>
@@ -100,7 +100,7 @@ export default function Controllables({
             setVolume(v);
             player?.setVolume(v * 100);
           }}
-          className="flex-1 accent-purple-400 cursor-pointer"
+          className="flex-1 accent-white cursor-pointer"
         />
         <HighVol />
       </div>

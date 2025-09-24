@@ -143,17 +143,31 @@ const PBplayerPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#07060C] via-[#1a1333] to-[#3a1c71] text-white flex flex-col items-center">
       <div className="w-full max-w-6xl mt-8 px-4">
         {/* top bar */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex relative justify-between items-center mb-8">
           <a
             href="/dashboard"
             className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition shadow-lg"
           >
             <Home size={28} />
           </a>
+          <div className="w-full max-w-xl mx-auto">
+            <Search onChange={(e) => setSearch(e.target.value)} />
+            {searchResults.length > 0 && (
+              <div className="absolute mt-2 w-full max-w-xl max-h-96 overflow-y-auto rounded-2xl bg-black/90 backdrop-blur-lg shadow-2xl border border-purple-700 custom-scrollbar transition-all z-30">
+                {searchResults.map((track) => (
+                  <SearchResults
+                    track={track}
+                    key={track.uri}
+                    chooseTrack={chooseTrack}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <ActionButtons />
         </div>
 
-        <div className="relative flex flex-col items-center mb-2">
+        {/* <div className="relative flex flex-col items-center mb-2 bg-amber-50">
           <div className="w-full max-w-xl mx-auto">
             <Search onChange={(e) => setSearch(e.target.value)} />
             {searchResults.length > 0 && (
@@ -168,7 +182,7 @@ const PBplayerPage = () => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-12 flex flex-row items-center justify-center gap-10">
           {/*yt player */}
