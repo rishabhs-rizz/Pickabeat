@@ -31,11 +31,11 @@ export default function DashBoard({ searchParams }: DashBoardProps) {
     });
 
   async function handleCreateStream() {
-    const ticket = await axios
+    const token = await axios
       .get("http://localhost:3000/api/ws-ticket")
-      .then((res) => res.data.ticket);
+      .then((res) => res.data.token);
     // const ws = new WebSocket(`ws://localhost:8080?ticket=${ticket}`);
-    console.log("Ticket:", ticket);
+    console.log("token :", token);
   }
 
   return (

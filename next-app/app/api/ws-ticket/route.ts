@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 import jwt from "jsonwebtoken";
 
 function addCorsHeaders(res: NextResponse) {
@@ -18,19 +19,21 @@ export async function OPTIONS() {
 }
 
 export async function GET(req: Request) {
-  const session = await getServerSession();
-  console.log("Session in ws-ticket:", session);
+  const session = await getServerSession(authOptions);
+  console.log("Session in ws-token:", session);
 
-  if (!session || !session.user.email) {
+  if (!session || !session.user.id) {
     const res = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     return addCorsHeaders(res);
   }
-
+  console.log("Session User:", session.user.id);
   // Issue short-lived JWT for WS connection
-  const ticket = jwt.sign({ userId: session.user.id }, process.env.WS_SECRET!, {
+  const token = jwt.sign({ userId: session.user.id }, process.env.WS_SECRET!, {
     expiresIn: "5m",
   });
 
-  const res = NextResponse.json({ ticket });
+  console.log("Issued WS token:", token);
+
+  const res = NextResponse.json({ token });
   return addCorsHeaders(res);
 }
