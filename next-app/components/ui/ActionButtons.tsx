@@ -6,12 +6,13 @@ import { useState } from "react";
 
 export function ActionButtons() {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [isJoinModalOpen, setisJoinModalOpen] = useState(false);
+  const [isJoinModalOpen, setJoinModalOpen] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [link, setLink] = useState("");
   const [roomId, setRoomId] = useState("");
   const [clicked, setClicked] = useState(false);
   const [description, setDescription] = useState("");
+
   return (
     <>
       <div className="flex justify-center items-center gap-2">
@@ -29,8 +30,8 @@ export function ActionButtons() {
         <Button
           onClick={
             isJoinModalOpen
-              ? () => setisJoinModalOpen(false)
-              : () => setisJoinModalOpen(true)
+              ? () => setJoinModalOpen(false)
+              : () => setJoinModalOpen(true)
           }
           size="lg"
           variant="outline"
@@ -95,6 +96,36 @@ export function ActionButtons() {
               className="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800"
             >
               {clicked ? "Creating..." : "Create Room"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isJoinModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setJoinModalOpen(false)}
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-semibold mb-2">Join Room</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Enter the room ID to join an existing room.
+            </p>
+            <input
+              className="w-full px-4 py-2 border rounded mb-2"
+              placeholder="Enter the link"
+              onChange={(e) => setLink(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                handleJoinRoom(link);
+              }}
+              className="bg-black text-white px-4 py-2 rounded w-full hover:bg-gray-800"
+            >
+              Join Room
             </button>
           </div>
         </div>

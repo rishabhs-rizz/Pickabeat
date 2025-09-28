@@ -1,8 +1,9 @@
 import { prisma } from "@/app/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET({ params }: { params: { link: string } }) {
-  const { link } = params;
+export async function GET(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const link = pathname.split("/").pop();
 
   if (!link) {
     return NextResponse.json(
@@ -15,7 +16,7 @@ export async function GET({ params }: { params: { link: string } }) {
 
   try {
     const room = await prisma.room.findUnique({
-      where: { id: link },
+      where: { link: link },
       include: { streams: true },
     });
 

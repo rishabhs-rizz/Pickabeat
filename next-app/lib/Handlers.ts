@@ -1,4 +1,5 @@
 import axios from "axios";
+import { redirect } from "next/navigation";
 
 export const handleMusicConverting = async (uri: string) => {
   const trackId = uri.split(":").pop();
@@ -38,7 +39,16 @@ export const handleCopy = (link: string) => {
   alert("Link copied to clipboard!");
 };
 
-export const handleJoinRoom = () => {};
+export const handleJoinRoom = async (link: string) => {
+  if (!link) return alert("Enter the link");
+  console.log("Joining room with the link:", link);
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`http://localhost:3000/api/Room/${link}`);
+  const data = response.data;
+  console.log("Room data:", data);
+  const roomId = data.room.id;
+  redirect(`http://localhost:3000/stream/${roomId}`);
+};
 
 export const handleCreateRoom = async (
   roomName: string,
