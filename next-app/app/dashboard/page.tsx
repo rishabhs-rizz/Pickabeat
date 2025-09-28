@@ -34,23 +34,11 @@ export default function DashBoard({ searchParams }: DashBoardProps) {
     const token = await axios
       .get("http://localhost:3000/api/ws-ticket")
       .then((res) => res.data.token);
-    // const ws = new WebSocket(`ws://localhost:8080?ticket=${ticket}`);
     console.log("token :", token);
   }
 
   return (
     <>
-      <ToastContainer
-        position="top-center"
-        autoClose={1000}
-        hideProgressBar
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover={false} // quick slide-down effect
-      />
       <div className="min-h-screen bg-[#07060C] text-white">
         <div className="flex flex-col items-center justify-center pt-20">
           {session.data?.user && (
