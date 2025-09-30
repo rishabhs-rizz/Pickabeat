@@ -3,6 +3,9 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import JWT_SECRET from "./config";
 
 import dotenv from "dotenv";
+import { JoinRoom } from "./JoinRoom";
+import { EventInRoom } from "./EventInRoom";
+import { LeaveRoom } from "./LeaveRoom";
 dotenv.config();
 
 const wss = new WebSocketServer({ port: 8080 });
@@ -66,6 +69,29 @@ wss.on("connection", function connection(ws, request) {
       if (!ParsedData.type) {
         ws.send("Type Required");
         return;
+      }
+      switch (ParsedData.type) {
+        case "join":
+          JoinRoom(ws, ParsedData.roomId);
+          break;
+        case "event":
+          EventInRoom(
+            ws,
+            ParsedData.message,
+            ParsedData.roomId,
+            ParsedData.url,
+            ParsedData.title,
+            ParsedData.image,
+            ParsedData.extractedId,
+            id
+          );
+          break;
+        case "leave":
+          LeaveRoom(ws, ParsedData.roomId);
+          break;
+        default:
+          ws.send("Invalid event Type");
+          break;
       }
     } catch (error) {
       ws.send("Invalid JSON");
