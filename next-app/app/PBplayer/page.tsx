@@ -34,6 +34,7 @@ const PBplayerPage = () => {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const accessToken = usePlayerAuth(code || "");
+  localStorage.setItem("accessToken", accessToken || "");
 
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Track[]>([]);
@@ -51,7 +52,7 @@ const PBplayerPage = () => {
       clientId: process.env.SPOTIFY_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
       redirectUri: process.env.REDIRECT_URI,
-    })
+    }),
   );
 
   useEffect(() => {
@@ -93,7 +94,7 @@ const PBplayerPage = () => {
           title: track.name,
           uri: track.uri,
           albumUrl: track.album.images[0].url,
-        }))
+        })),
       );
     });
     return () => {
@@ -193,7 +194,8 @@ const PBplayerPage = () => {
                   }}
                   onReady={(e: YouTubeEvent) => setPlayer(e.target)}
                   onStateChange={(e) => {
-                    if (e.data === 1) setPlaying(true); // PLAYING
+                    if (e.data === 1)
+                      setPlaying(true); // PLAYING
                     else if (e.data === 2 || e.data === 0) setPlaying(false); // PAUSED or ENDED
                   }}
                 />
